@@ -269,7 +269,11 @@ module.exports = function () {
     function update(game) {
         var table = new Table(game);
         var hand = new Hand(game.self.cards.concat(table.getCommunity()));
-        return 1000000;
+        if(hand.isPair()) {
+            return 1000000;
+        } else {
+            return -1;
+        }
     }
 
     return {
