@@ -269,8 +269,7 @@ module.exports = function () {
     function update(game) {
         var table = new Table(game);
         var hand = new Hand(game.self.cards.concat(table.getCommunity()));
-        console.log(JSON.stringify(game, null, 2));
-        return 100;
+        return 1000000;
     }
 
     return {

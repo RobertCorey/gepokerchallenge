@@ -6,8 +6,8 @@ var NUMBER_OF_TOURNAMENTS = 50,
 
 var tournament = require('./tournament')
     , MachinePoker = require('machine-poker')
-    , ChallBot = require('../players/challengerBot')
-    , challenger = MachinePoker.seats.JsLocal.create(ChallBot)
+    // , ChallBot = require('../players/challengerBot')
+    // , challenger = MachinePoker.seats.JsLocal.create(ChallBot)
     , async = require('async')
     , sys = require('sys')
     , assert = require('assert');
@@ -32,7 +32,7 @@ function runTournaments(n, next) {
     hands: HANDS_PER_TOURNAMENT,
     chips: CHIPS
   }
-  var table = tournament.createTable(challenger, opts)
+  var table = tournament.createTable(opts)
   table.on('tournamentComplete', function (players) {
     for (var i=0; i < players.length; i++) {
       var p = players[i];
@@ -41,13 +41,6 @@ function runTournaments(n, next) {
       } else {
         playerWinnings[p.name] = CHIPS*NUMBER_OF_TOURNAMENTS;
       }
-    }
-    var player = getPlayer(players, challenger);
-    var bankRoll = playerWinnings[challenger.name];
-    if (player.chips >= CHIPS * CHALLENGE) {
-      sys.print(greenColor + (n+1) + ". W - Earnings: $" + player.chips + "\t\t\tTotal: $" + bankRoll + resetColor + "\n")
-    } else {
-      sys.print(redColor + (n+1) +". L - Earnings: $" + player.chips + "\t\tTotal: $" + bankRoll + resetColor + "\n")
     }
     next(null, player.chips);
   });
@@ -71,33 +64,3 @@ function printTournamentResults() {
     }
   }
 }
-
-describe("Writing a winning poker bot", function () {
-  this.timeout(120000);
-
-  it("should be your own bot", function (done) {
-    assert.ok(challenger.playerInfo.name !== "Nameless Challenger", "Start by naming your bot");
-    assert.ok(challenger.playerInfo.email.length > 0, "Give your email address");
-    assert.ok(challenger.playerInfo.btcWallet.length > 0, "Where should we send the money?");
-    done();
-  });
-
-  it("should increase money "+ CHALLENGE + "x",
-    function (done) {
-      sys.print("\n\n===Starting Tournament Round " + ROUND + "===\n\n");
-      async.timesSeries(
-        NUMBER_OF_TOURNAMENTS,
-        runTournaments, function (err, winnings) {
-          var toBeat = CHALLENGE * NUMBER_OF_TOURNAMENTS * CHIPS;
-          winnings = winnings.reduce(function (x, y) { return x + y });
-          printTournamentResults();
-          assert.ok(
-            winnings > toBeat,
-            "Needed to win at least $" + toBeat + ". Won $" + winnings
-          );
-          done();
-        });
-    }
-  );
-
-});
